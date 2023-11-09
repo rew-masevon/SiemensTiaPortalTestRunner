@@ -4,6 +4,7 @@ using Siemens.Engineering.Download;
 using Siemens.Engineering.Download.Configurations;
 using Siemens.Engineering.HW;
 using Siemens.Engineering.Online;
+using Siemens.Engineering.Online.Configurations;
 using Siemens.Engineering.TestSuite;
 using Siemens.Engineering.TestSuite.ApplicationTest;
 using System;
@@ -60,6 +61,15 @@ static void Download(DeviceItem cpu, string modeName, string adapterName, string
 static void SetLegacyCommunication(DeviceItem cpu, bool enable, ConfigurationTargetInterface target)
 {
     var onlineProvider = cpu.GetService<OnlineProvider>();
+
+    // This causes an error: Error when calling method 'Subscribe' of type 'OnlineLegitimation'.
+    onlineProvider.Configuration.OnlineLegitimation += configuration =>
+    {
+        if (configuration is TlsVerificationConfiguration tlsConfig)
+        {
+            tlsConfig.CurrentSelection = TlsVerificationConfigurationSelection.NonVerified;
+        }
+    };
 
     Console.WriteLine($"OnlineProvider.IsConfigured: {onlineProvider.Configuration.IsConfigured}");
     Console.WriteLine($"OnlineProvider.EnableLegacyCommunication: {onlineProvider.Configuration.EnableLegacyCommunication}");
